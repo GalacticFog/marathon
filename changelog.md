@@ -56,6 +56,32 @@ Network security groups only allow network traffic between tasks that have at le
 groups in common. This makes it easy to disallow your staging environment to interfere with production
 traffic.
 
+#### EXPERIMENTAL: Service Discovery
+
+If an application requires IP-per-task, then it can not request ports to be allocated in the slave. It is
+however still possible to describe the ports that the Application's tasks expose:
+
+```javascript
+{
+  "id": "/i-have-my-own-ip",
+  // ... more settings ...
+  "ipAddress": {
+    "discovery": {
+      "ports": [
+        { "number": 80, "name": "http", "protocol": "tcp" }
+      ]
+    }
+      // ... more settings ...
+  }
+}
+```
+
+Marathon will pass down this information to Mesos (inside the DiscoveryInfo message) when starting new tasks,
+[mesos-dns](https://github.com/mesosphere/mesos-dns) will then expose this information through IN SRV records.
+
+In the future Marathon will also fill in the DiscoveryInfo message for applications that don't require
+IP-per-task.
+
 ## Changes from 0.11.1 to 0.13.0
 
 ### Breaking Changes
